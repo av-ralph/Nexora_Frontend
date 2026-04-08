@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id          BigInt   @id @default(autoincrement())
+  name        String?  @db.VarChar(255)
+  email       String?  @unique @db.VarChar(255)
+  password    String?  @db.VarChar(255)
+  isAdmin     Boolean? @default(false) @map("is_admin")
+  status      String?  @default("active") @db.VarChar(50)
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  profileUrl  String?  @map("profile_url") @db.Text
+  authId      String?  @map("auth_id") @db.Uuid
+  updatedAt   DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  settings    Json?    @default("{\"language\": \"English\"}")
+
+  @@map("users")
+}
+model Favorite {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String   @db.Uuid
+  movie_id     BigInt
+  movie_title  String?
+  movie_poster String?
+  media_type   String?  @default("movie")
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([user_id, movie_id], name: "favorites_user_id_movie_id_key")
+  @@map("favorites")
+}
+
+model WatchHistory {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String   @db.Uuid
+  movie_id     BigInt
+  movie_title  String?
+  movie_poster String?
+  media_type   String?  @default("movie")
+  watched_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([user_id, movie_id], name: "watch_history_user_id_movie_id_key")
+  @@map("watch_history")
+}
+
+model Review {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  movie_id    BigInt
+  author_id   String   @db.Uuid
+  author_name String
+  rating      Int
+  content     String   @db.Text
+  likes       Int      @default(0)
+  liked_by    String[] @default([])
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@index([movie_id])
+  @@index([author_id])
+  @@map("reviews")
+}
+
+model WatchPartyRoom {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  host_id       String   @db.Uuid
+  host_name     String
+  media_title   String
+  media_poster  String?  @db.Text
+  playback_state String   @default("paused")
+  playback_position Float  @default(0)
+  playback_updated_at DateTime @default(now()) @db.Timestamptz(6)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  participants WatchPartyParticipant[]
+  messages     WatchPartyChatMessage[]
+
+  @@map("watch_party_rooms")
+}
+
+model WatchPartyParticipant {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  room_id   String   @db.Uuid
+  user_id   String   @db.Uuid
+  user_name String
+  is_host   Boolean  @default(false)
+  joined_at DateTime @default(now()) @db.Timestamptz(6)
+
+  room WatchPartyRoom @relation(fields: [room_id], references: [id], onDelete: Cascade)
+
+  @@map("watch_party_participants")
+}
+
+model WatchPartyChatMessage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  room_id   String   @db.Uuid
+  user_id   String   @db.Uuid
+  user_name String
+  text      String   @db.Text
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  room WatchPartyRoom @relation(fields: [room_id], references: [id], onDelete: Cascade)
+
+  @@index([room_id])
+  @@map("watch_party_chat_messages")
+}
+
+// Auth schema models for Supabase
+// Note: We reference the auth.users table directly without defining it in our schema
+// since Supabase manages the auth schema and we don't have ownership
+
