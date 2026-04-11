@@ -8,8 +8,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 let cachedServer: express.Application;
 
 async function bootstrap() {
-  // @ts-expect-error Dynamic import of built module
-  const { AppModule } = await import('../dist/app.module');
+  // @ts-expect-error
+  const { AppModule } = await import('../src/app.module');
 
   const nestApp = await NestFactory.create<NestExpressApplication>(
     AppModule,
