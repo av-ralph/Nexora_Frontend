@@ -1,31 +1,34 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-argument */
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import express from 'express';
-import serverlessExpress from '@vendia/serverless-express';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const server = express();
-let handler: any;
+let cachedServer: express.Application;
 
 async function bootstrap() {
+  // @ts-expect-error Dynamic import of built module
   const { AppModule } = await import('../dist/app.module');
 
-  const app = await NestFactory.create(
+  const nestApp = await NestFactory.create<NestExpressApplication>(
     AppModule,
-    new ExpressAdapter(server),
+    new ExpressAdapter(express()),
   );
 
-  await app.init();
+  await nestApp.init();
+
+  return nestApp.getHttpAdapter().getInstance();
 }
 
-export default async function (req: any, res: any) {
+export default async function (req: VercelRequest, res: VercelResponse) {
   try {
-    if (!handler) {
-      await bootstrap();
-      handler = serverlessExpress({ app: server });
+    if (!cachedServer) {
+      cachedServer = await bootstrap();
     }
 
-    return handler(req, res);
-  } catch (error) {
+    return cachedServer(req, res);
+  } catch (error: any) {
     console.error('🔥 SERVER ERROR:', error);
     res.status(500).json({
       error: 'Internal Server Error',
