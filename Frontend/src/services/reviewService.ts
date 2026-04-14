@@ -63,6 +63,7 @@ export const updateReview = async (
 ) => {
   try {
     const review = await reviewsAPI.updateReview(reviewId, {
+      authorId,
       rating,
       content,
     });
@@ -75,7 +76,7 @@ export const updateReview = async (
 
 export const deleteReview = async (reviewId: string, authorId: string) => {
   try {
-    await reviewsAPI.deleteReview(reviewId);
+    await reviewsAPI.deleteReview(reviewId, authorId);
     return true;
   } catch (error) {
     console.error('Error deleting review:', error);

@@ -27,6 +27,7 @@ const SettingsPage = () => {
   }, [navigate]);
 
   const handleLogout = async () => {
+    localStorage.removeItem("adminUser");
     await supabase.auth.signOut();
     navigate('/login');
   };

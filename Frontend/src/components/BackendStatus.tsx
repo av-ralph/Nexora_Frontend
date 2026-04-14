@@ -11,7 +11,7 @@ const BackendStatus: React.FC = () => {
         const data = await fetchBackendStatus();
         setStatus(data);
       } catch (err) {
-        setError('Could not connect to backend. Make sure the NestJS server is running at http://127.0.0.1:3000');
+        setError('Could not connect to backend. Make sure the NestJS server is running at http://127.0.0.1:3001');
       }
     };
 

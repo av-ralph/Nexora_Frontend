@@ -498,47 +498,6 @@ const MoviePage = () => {
           </motion.div>
         </div>
 
-        <div className="relative z-20 mt-6 flex flex-wrap gap-3 items-center">
-          <button
-            type="button"
-            onClick={async () => {
-              setIsPartyLoading(true);
-              const { data } = await supabase.auth.getSession();
-              if (!data.session) {
-                navigate('/login');
-                return;
-              }
-              const room = await createRoom(
-                {
-                  id: data.session.user.id,
-                  name: data.session.user.email?.split('@')[0] ?? 'Nexora',
-                },
-                {
-                  mediaTitle: movie.title,
-                  mediaPoster: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : '',
-                },
-              );
-              setIsPartyLoading(false);
-              navigate(`/watch/${room.roomId}`);
-            }}
-            className="inline-flex items-center gap-2 rounded-full bg-indigo-500 px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-black transition-all hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <Users size={16} /> {isPartyLoading ? 'Opening...' : 'Start Watch Party'}
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsShareOpen(true)}
-            className="inline-flex items-center gap-2 rounded-full bg-white/5 px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-white/10"
-          >
-            <Share2 size={16} /> Share
-          </button>
-          <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-black/30 px-4 py-3 text-sm text-gray-300">
-            <span className="font-black text-white">{Number.isFinite(reviewStats.averageRating) ? reviewStats.averageRating.toFixed(1) : '0.0'}</span>
-            <span className="text-gray-500">⭐</span>
-            <span>{reviewStats.totalReviews} reviews</span>
-          </div>
-        </div>
-
         {/* Middle Section: Info, Play Button, and Actions */}
         <div className="flex-1 min-h-[60vh] md:flex-row justify-start md:justify-between relative">
           
@@ -613,6 +572,75 @@ const MoviePage = () => {
       </div>
 
       <ReviewSection movieId={movie.id} movieTitle={movie.title} />
+
+      <div className="relative z-10 mt-10 px-4 md:px-12 lg:px-24">
+        <div className="rounded-[2rem] border border-white/10 bg-[#090a15]/85 backdrop-blur-2xl p-6 shadow-[0_30px_80px_rgba(8,15,40,0.55)]">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-2">
+              <p className="text-[10px] uppercase tracking-[0.35em] text-indigo-400/80">Community Control</p>
+              <p className="max-w-2xl text-sm text-gray-300">Continue the experience after reviews — start a watch party with friends, share the mood, or save it for later.</p>
+            </div>
+            <div className="flex flex-wrap justify-start gap-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  setIsPartyLoading(true);
+                  const { data } = await supabase.auth.getSession();
+                  if (!data.session) {
+                    navigate('/login');
+                    return;
+                  }
+                  const room = await createRoom(
+                    {
+                      id: data.session.user.id,
+                      name: data.session.user.email?.split('@')[0] ?? 'Nexora',
+                    },
+                    {
+                      mediaTitle: movie.title,
+                      mediaPoster: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : '',
+                    },
+                  );
+                  setIsPartyLoading(false);
+                  navigate(`/watch/${room.roomId}`);
+                }}
+                className="inline-flex items-center gap-2 rounded-full bg-indigo-500 px-4 py-3 text-sm font-black uppercase tracking-[0.18em] text-black transition-all hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Users size={16} /> {isPartyLoading ? 'Opening...' : 'Watch Party'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsShareOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-3 text-sm font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-white/15"
+              >
+                <Share2 size={16} /> Share
+              </button>
+            </div>
+          </div>
+          <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm text-gray-300">
+              <span className="font-black text-white">{Number.isFinite(reviewStats.averageRating) ? reviewStats.averageRating.toFixed(1) : '0.0'}</span>
+              <span className="text-gray-500">⭐</span>
+              <span>{reviewStats.totalReviews} reviews</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={toggleBookmark}
+                className={`inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-black uppercase tracking-[0.18em] transition-all ${isBookmarked ? 'text-indigo-400 border-indigo-400/30 bg-indigo-500/10' : 'text-white hover:bg-white/10'}`}
+              >
+                <Bookmark size={16} fill={isBookmarked ? 'currentColor' : 'none'} />
+                {isBookmarked ? 'Bookmarked' : 'Save'}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/Explore')}
+                className="inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-3 text-sm font-black uppercase tracking-[0.18em] text-white transition-all hover:bg-white/15"
+              >
+                <Search size={16} /> Explore
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Cast Section */}
       <div ref={castRef} className="relative z-10 mt-32 px-4 md:px-12 lg:px-24 pb-48">

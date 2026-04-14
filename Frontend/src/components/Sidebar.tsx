@@ -70,6 +70,7 @@ const Sidebar = ({ isOpen = true, onClose }: { isOpen?: boolean, onClose?: () =>
 
   const handleLogout = async () => {
     try {
+      localStorage.removeItem("adminUser");
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       navigate('/login');

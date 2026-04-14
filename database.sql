@@ -72,3 +72,16 @@ USING (auth.uid() = user_id);
 -- 8. Create index for performance
 CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON public.favorites(user_id);
 
+-- 9. Grant Permissions
+-- Ensure the public schema is accessible
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+
+-- Grant full access to authenticated users for their own data (RLS will still restrict to user_id)
+GRANT ALL ON TABLE public.watch_history TO authenticated;
+GRANT ALL ON TABLE public.favorites TO authenticated;
+
+-- Grant read-only access to anon users if needed
+GRANT SELECT ON TABLE public.watch_history TO anon;
+GRANT SELECT ON TABLE public.favorites TO anon;
+
+

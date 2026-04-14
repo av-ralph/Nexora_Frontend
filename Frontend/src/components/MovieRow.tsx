@@ -98,20 +98,33 @@ const MovieRow = ({ title, movies = [], isLoading = false, mediaType = 'movie' }
 
   // --- FETCH FAVORITES FROM SUPABASE ---
   useEffect(() => {
+    let mounted = true;
+    
     const fetchFavorites = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      if (!session || !mounted) return;
 
-      const { data, error } = await supabase
-        .from('favorites')
-        .select('movie_id')
-        .eq('user_id', session.user.id);
+      try {
+        const { data, error } = await supabase
+          .from('favorites')
+          .select('movie_id')
+          .eq('user_id', session.user.id);
 
-      if (!error && data) {
-        setSavedMovies(data.map(f => f.movie_id));
+        if (error) {
+          console.warn('Favorites query skipped:', error.message);
+          return;
+        }
+        
+        if (data) {
+          setSavedMovies(data.map(f => f.movie_id));
+        }
+      } catch (e) {
+        console.error('Favorites error:', e);
       }
     };
+    
     fetchFavorites();
+    return () => { mounted = false; };
   }, []);
 
   // --- SCROLL LOGIC ---

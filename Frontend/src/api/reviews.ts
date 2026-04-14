@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:3000";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:3001";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -66,9 +66,19 @@ export const createReview = async (data: {
   }
 };
 
+export const deleteReview = async (id: string, authorId: string): Promise<void> => {
+  try {
+    await api.delete(`/reviews/${id}`, { params: { authorId } });
+  } catch (error) {
+    console.error("Error deleting review:", error);
+    throw error;
+  }
+};
+
 export const updateReview = async (
   id: string,
   data: {
+    authorId: string;
     rating: number;
     content: string;
   }
@@ -78,15 +88,6 @@ export const updateReview = async (
     return res.data;
   } catch (error) {
     console.error("Error updating review:", error);
-    throw error;
-  }
-};
-
-export const deleteReview = async (id: string): Promise<void> => {
-  try {
-    await api.delete(`/reviews/${id}`);
-  } catch (error) {
-    console.error("Error deleting review:", error);
     throw error;
   }
 };
