@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+@theme {
+  --color-drameeo-bg: #070A1B;
+  --color-drameeo-card: rgba(15, 22, 56, 0.6);
+  --color-drameeo-border: rgba(101, 128, 255, 0.25);
+  --shadow-luminous: 0 10px 40px rgba(80, 96, 240, 0.35);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(130, 150, 255, 0.52) rgba(6, 11, 28, 0.8);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(8, 12, 28, 0.85);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(130, 150, 255, 0.6);
+  border-radius: 999px;
+}
+
+body {
+  min-height: auto;
+  font-family: 'Poppins', sans-serif;
+  background: #050510;
+  background-attachment: fixed;
+}
+
+
