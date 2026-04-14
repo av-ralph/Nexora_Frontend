@@ -1,12 +1,12 @@
 {
-  "installCommand": "cd Backend && npm install",
-  "buildCommand": "cd Backend && npm run build",
+  "buildCommand": "npm install && npm run build",
+  "installCommand": "npm install",
   "framework": null,
   "outputDirectory": "dist",
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "Backend/api/index.ts"
+      "dest": "api/index.ts"
     }
   ]
 }
