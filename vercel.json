@@ -1,13 +1,12 @@
 {
-  "experimentalServices": {
-    "frontend": {
-      "entrypoint": "frontend",
-      "routePrefix": "/",
-      "framework": "vite"
-    },
-    "backend": {
-      "entrypoint": "backend",
-      "routePrefix": "/"
+  "buildCommand": "cd Backend && npm run build",
+  "installCommand": "npm install",
+  "framework": null,
+  "outputDirectory": "dist",
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "Backend/api/index.ts"
     }
-  }
+  ]
 }
