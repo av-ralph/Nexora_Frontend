@@ -10,7 +10,6 @@ import RecentPage from './pages/RecentPage';
 import SettingsPage from './pages/Settings';
 import ReelPage from './pages/ReelPage';
 import WatchPartyRoom from './pages/WatchPartyRoom';
-import BackendStatus from './components/BackendStatus';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -45,7 +44,6 @@ const App = () => (
         <Route path="watch-history" element={<AdminWatchHistory />} />
       </Route>
     </Routes>
-    <BackendStatus />
   </Router>
 );
 

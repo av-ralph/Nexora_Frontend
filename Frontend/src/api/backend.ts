@@ -7,16 +7,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-export const fetchBackendStatus = async () => {
-  try {
-    const res = await api.get("/status");
-    return res.data;
-  } catch (error) {
-    console.error("Error connecting to backend:", error);
-    throw error;
-  }
-};
-
 // User API
 export const createUser = async (userData: any) => {
   const res = await api.post("/users", userData);
