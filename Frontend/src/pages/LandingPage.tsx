@@ -258,7 +258,7 @@ const LandingPage = () => {
                   <Link to="/login" className="hidden sm:block px-4 md:px-6 py-2 text-[10px] md:text-xs font-black text-gray-400 hover:text-white transition-all hover:tracking-widest uppercase tracking-widest">
                     Login
                   </Link>
-                  <Link to="/login" className="relative group px-6 md:px-10 py-3 md:py-4 bg-white text-black rounded-2xl text-[10px] md:text-xs font-black hover:scale-105 active:scale-95 transition-all duration-500 shadow-2xl shadow-white/5 uppercase tracking-[0.2em] overflow-hidden">
+                  <Link to="/register" className="relative group px-6 md:px-10 py-3 md:py-4 bg-white text-black rounded-2xl text-[10px] md:text-xs font-black hover:scale-105 active:scale-95 transition-all duration-500 shadow-2xl shadow-white/5 uppercase tracking-[0.2em] overflow-hidden">
                     <span className="relative z-10 group-hover:text-white transition-colors duration-500 uppercase">Sign Up</span>
                     <div className="absolute inset-0 bg-indigo-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
                   </Link>

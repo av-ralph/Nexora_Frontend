@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import MoviePage from './pages/MoviePage';
 import TVShowPage from './pages/TVShowPage';
 import Explore from './pages/Explore';
@@ -26,6 +27,7 @@ const App = () => (
       <Route path="/home" element={<Home />} />
       <Route path="/explore" element={<Explore />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
       <Route path="/favorites" element={<Favorites />} />
       <Route path="/recent" element={<RecentPage />} />
       <Route path="/settings" element={<SettingsPage/>}/>

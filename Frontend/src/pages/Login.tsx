@@ -3,17 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { 
   Mail, 
   Lock, 
-  User, 
-  ArrowRight, 
-  ShieldCheck, 
   Loader2, 
-  AlertCircle, 
-  CheckCircle2, 
-  ChevronLeft,
   Eye,
   EyeOff,
-  Sparkles,
-  Zap
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import { FaGithub, FaGoogle } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,19 +15,15 @@ import { supabase } from '../lib/supabase';
 import { adminLogin } from '../api/admin';
 
 const Login = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [shake, setShake] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
   const navigate = useNavigate();
 
-  // Redirect if already logged in
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -47,52 +37,59 @@ const Login = () => {
       }
     };
     checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session) {
+        const adminUser = localStorage.getItem("adminUser");
+        if (adminUser) {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/home');
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
-  // Reset states when switching modes
   useEffect(() => {
     setError(null);
     setSuccess(null);
     setShowPassword(false);
-  }, [isLogin]);
+  }, []);
 
   const validateForm = () => {
     if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      triggerError('Please enter a valid neural terminal address.');
+      setError('Please enter a valid email address.');
       return false;
     }
     if (password.length < 8) {
-      triggerError('Access key must be at least 8 characters long.');
+      setError('Password must be at least 8 characters long.');
       return false;
     }
-    if (!isLogin) {
-      if (fullName.trim().split(' ').length < 2) {
-        triggerError('Please provide your full architect identity (First & Last Name).');
-        return false;
-      }
-    }
     return true;
-  };
-
-  const triggerError = (msg: string) => {
-    setError(msg);
-    setShake(true);
-    setTimeout(() => setShake(false), 500);
   };
 
   const handleSocialLogin = async (provider: 'google' | 'github') => {
     try {
       setLoading(true);
       setError(null);
-      const { error } = await supabase.auth.signInWithOAuth({
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/home`,
+          scopes: provider === 'github' ? 'user:email read:user' : undefined,
         },
       });
+
       if (error) throw error;
+      
+      if (!data.url) {
+        setError('Social login failed. Please try again.');
+      }
     } catch (err: any) {
-      triggerError(err.message || 'Neural connection failed. Please retry.');
+      setError(err.message || 'Social login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -100,10 +97,10 @@ const Login = () => {
 
   const handleForgotPassword = () => {
     if (!email) {
-      triggerError('Enter your email to initiate recovery.');
+      setError('Please enter your email to reset your password.');
       return;
     }
-    setSuccess('Recovery link dispatched to your neural terminal.');
+    setSuccess('Password reset link has been sent to your email.');
     setTimeout(() => setSuccess(null), 5000);
   };
 
@@ -116,63 +113,41 @@ const Login = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        
-        // Check if user is admin and redirect accordingly
-        try {
-          const res = await adminLogin(email, password);
-          if (res?.success && res.user?.isAdmin) {
-            localStorage.setItem("adminUser", JSON.stringify(res.user));
-            setSuccess('Welcome back, Admin! Synchronizing dashboard...');
-            setTimeout(() => navigate('/admin/dashboard'), 1500);
-            return;
-          } else {
-            localStorage.removeItem("adminUser");
-          }
-        } catch (adminErr) {
-          console.log('Admin check failed:', adminErr);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      
+      try {
+        const res = await adminLogin(email, password);
+        if (res?.success && res.user?.isAdmin) {
+          localStorage.setItem("adminUser", JSON.stringify(res.user));
+          setSuccess('Welcome back, Admin! Redirecting to dashboard...');
+          setTimeout(() => navigate('/admin/dashboard'), 1500);
+          return;
+        } else {
           localStorage.removeItem("adminUser");
         }
-
-        setSuccess('Identity verified. Redirecting to Core...');
-        setTimeout(() => navigate('/home'), 1500);
-      } else {
-        const { error, data } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName,
-            },
-          },
-        });
-        if (error) throw error;
-        
-        if (data?.user?.identities?.length === 0) {
-          triggerError('This identity is already registered in the registry.');
-        } else {
-          setSuccess('Identity created! Dispatching confirmation link to terminal.');
-        }
+      } catch (adminErr) {
+        console.log('Admin check failed:', adminErr);
+        localStorage.removeItem("adminUser");
       }
+
+      setSuccess('Login successful! Redirecting...');
+      setTimeout(() => navigate('/home'), 1500);
     } catch (err: any) {
-      triggerError(err.message || 'System error. Failed to initialize session.');
+      setError(err.message || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const containerVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
+    hidden: { opacity: 0 },
     visible: { 
-      opacity: 1, 
-      scale: 1,
-      transition: { 
-        duration: 0.5,
+      opacity: 1,
+      transition: {
         staggerChildren: 0.1
       }
     }
@@ -180,287 +155,231 @@ const Login = () => {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { type: "spring" as const, stiffness: 100 }
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#050510] text-white flex items-center justify-center p-4 md:p-6 selection:bg-indigo-500 selection:text-white relative overflow-hidden font-sans">
-      {/* Immersive Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 blur-[120px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/10 blur-[120px] rounded-full animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_rgba(99,102,241,0.05)_0%,_transparent_70%)]" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4 md:p-8 relative">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5d2f751b-0791-4cb6-a646-8cfecd441a73/dftidq9-225b64ad-03c8-4565-861d-ae93119ca12c.png/v1/fill/w_1095,h_730,q_70,strp/anime_sano_city_backdrop_5_by_ashurashuraya_dftidq9-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODk2IiwicGF0aCI6Ii9mLzVkMmY3NTFiLTA3OTEtNGNiNi1hNjQ2LThjZmVjZDQ0MWE3My9kZnRpZHE5LTIyNWI2NGFkLTAzYzgtNDU2NS04NjFkLWFlOTMxMTljYTEyYy5wbmciLCJ3aWR0aCI6Ijw9MTM0NCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.sW2pYxronmPzGFkPgzIFpewyPkzvH34XHMrjtEMseZg)' }}
+      />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/70" />
 
       <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="w-full max-w-5xl bg-white/[0.02] backdrop-blur-3xl border border-white/10 rounded-[2rem] md:rounded-[3rem] overflow-hidden flex flex-col md:flex-row shadow-2xl shadow-black/50 relative z-10"
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-lg"
       >
-        {/* Left Side: Brand Visuals */}
-        <div className="md:w-[45%] bg-indigo-600 p-8 sm:p-12 md:p-16 flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-indigo-600 to-indigo-950" />
-          
-          {/* Grid Pattern Overlay */}
-          <div className="absolute inset-0 opacity-20 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
-
-          <div className="relative z-10">
-            <Link to="/" className="inline-flex items-center space-x-3 md:space-x-4 mb-10 md:mb-16 group">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-700/50 overflow-hidden"
+        >
+          {/* Header Banner */}
+          <motion.div variants={itemVariants} className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-center">
+            <Link to="/" className="inline-flex items-center gap-3 justify-center">
               <motion.div 
-                whileHover={{ rotate: 90, scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 200 }}
-                className="w-10 h-10 md:w-14 md:h-14 bg-white rounded-xl md:rounded-2xl flex items-center justify-center shadow-2xl shadow-black/40"
+                whileHover={{ rotate: 45, scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center"
               >
-                <div className="w-5 h-5 md:w-7 md:h-7 bg-indigo-600 rounded rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+                <div className="w-5 h-5 bg-white rounded-sm" />
               </motion.div>
-              <span className="text-2xl md:text-4xl font-black tracking-tighter italic uppercase">NEXORA</span>
+              <span className="text-3xl font-bold text-white">NEXORA</span>
             </Link>
-
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={isLogin ? 'login-text' : 'signup-text'}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="space-y-6 md:space-y-8"
-              >
-                <div className="space-y-1 md:space-y-2">
-                  <p className="text-indigo-200/60 font-black text-[8px] md:text-[10px] uppercase tracking-[0.4em] md:tracking-[0.5em]">System_Status: Online</p>
-                  <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tighter uppercase italic">
-                    {isLogin ? (
-                      <>Access <br className="hidden md:block" /> The <br className="hidden md:block" /> Core_</>
-                    ) : (
-                      <>Forge <br className="hidden md:block" /> Your <br className="hidden md:block" /> Legend_</>
-                    )}
-                  </h2>
-                </div>
-                <p className="text-indigo-100/70 text-base md:text-lg font-medium leading-relaxed max-w-xs border-l-2 border-white/20 pl-4 md:pl-6">
-                  {isLogin 
-                    ? "Re-establish neural link with your personalized cinema experience." 
-                    : "Initialize your architect profile and unlock the future of streaming."}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          <div className="relative z-10 pt-6 md:pt-10 border-t border-white/10 mt-8 md:mt-10 flex items-center justify-between">
-            <div className="flex -space-x-3 md:-space-x-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl border-2 border-indigo-600 bg-indigo-400 overflow-hidden shadow-2xl relative group">
-                  <img src={`https://i.pravatar.cc/150?u=${i+20}`} alt="user" className="group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-indigo-600/20 group-hover:bg-transparent transition-colors" />
-                </div>
-              ))}
-            </div>
-            <div className="text-right">
-              <div className="text-[8px] md:text-[10px] font-black text-white/80 uppercase tracking-widest mb-1">+2.4M ARCHITECTS</div>
-              <div className="flex items-center justify-end gap-1">
-                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                <span className="text-[7px] md:text-[8px] font-black text-indigo-200 uppercase tracking-widest">Global_Sync_Active</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side: Form */}
-        <div className="md:w-[55%] p-8 sm:p-12 md:p-16 lg:p-20 flex flex-col justify-center bg-black/40 relative">
-          <div className="absolute top-0 right-0 p-8 opacity-5">
-            <ShieldCheck className="w-32 h-32 md:w-48 md:h-48 lg:w-64 lg:h-64 text-white" />
-          </div>
-
-          <motion.div variants={itemVariants} className="mb-8 md:mb-12 relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-3xl md:text-4xl font-black tracking-tight italic uppercase">
-                {isLogin ? 'Initialize' : 'Register'}
-              </h3>
-              <Link to="/" className="group text-gray-500 hover:text-white transition-all flex items-center space-x-2 text-[8px] md:text-[10px] font-black uppercase tracking-widest">
-                <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-                <span>Abort</span>
-              </Link>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="h-1 w-8 md:w-12 bg-indigo-600 rounded-full" />
-              <p className="text-gray-500 font-black uppercase tracking-[0.3em] text-[8px] md:text-[9px]">
-                {isLogin ? 'Authentication_Protocol_v4.2' : 'Identity_Genesis_Protocol'}
-              </p>
-            </div>
           </motion.div>
 
-          <AnimatePresence mode="wait">
-            {(error || success) && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className={`mb-6 md:mb-8 p-4 md:p-5 rounded-[1.25rem] md:rounded-[1.5rem] flex items-start space-x-3 md:space-x-4 text-[10px] md:text-xs font-black uppercase tracking-widest border backdrop-blur-xl relative z-10 ${
-                  success
-                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-lg shadow-emerald-500/5'
-                    : 'bg-red-500/10 border-red-500/20 text-red-400 shadow-lg shadow-red-500/5'
-                }`}
+          {/* Form Content */}
+          <motion.div variants={itemVariants} className="p-8">
+            <div className="text-center mb-8">
+              <motion.h2 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-2xl md:text-3xl font-bold text-white"
               >
-                {success ? <CheckCircle2 size={16} className="shrink-0 mt-0.5" /> : <AlertCircle size={16} className="shrink-0 mt-0.5" />}
-                <span className="leading-relaxed">{success || error}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                Welcome Back
+              </motion.h2>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="text-gray-400 mt-2"
+              >
+                Sign in to continue
+              </motion.p>
+            </div>
 
-          <motion.form 
-            animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
-            onSubmit={handleSubmit} 
-            className="space-y-4 md:space-y-6 relative z-10"
-          >
-            <AnimatePresence mode="popLayout">
-              {!isLogin && (
+            <AnimatePresence>
+              {(error || success) && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                  animate={{ opacity: 1, height: 'auto', marginBottom: 20 }}
-                  exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                  className="space-y-1.5 md:space-y-2 overflow-hidden"
+                  initial={{ opacity: 0, height: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, height: 'auto', scale: 1 }}
+                  exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                  className={`mb-6 p-4 rounded-xl flex items-start gap-3 ${
+                    success 
+                      ? 'bg-green-500/10 border border-green-500/20 text-green-400' 
+                      : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                  }`}
                 >
-                  <label className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] ml-1">Architect_Alias</label>
-                  <div className="relative group">
-                    <User className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-500 transition-colors" size={16} md={18} />
-                    <input
-                      type="text"
-                      placeholder="Enter Full Name"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl py-4 md:py-5 pl-12 md:pl-14 pr-6 outline-none focus:border-indigo-500/50 focus:bg-white/[0.07] transition-all font-bold text-xs md:text-sm text-white placeholder:text-gray-600"
-                      required
-                      disabled={loading}
-                    />
-                  </div>
+                  {success ? <CheckCircle size={20} className="shrink-0 mt-0.5" /> : <XCircle size={20} className="shrink-0 mt-0.5" />}
+                  <span className="text-sm">{success || error}</span>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <motion.div variants={itemVariants} className="space-y-1.5 md:space-y-2">
-              <label className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] ml-1">Terminal_Link</label>
-              <div className="relative group">
-                <Mail className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-500 transition-colors" size={16} md={18} />
-                <input
-                  type="email"
-                  placeholder="name@nexus.ai"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl py-4 md:py-5 pl-12 md:pl-14 pr-6 outline-none focus:border-indigo-500/50 focus:bg-white/[0.07] transition-all font-bold text-xs md:text-sm text-white placeholder:text-gray-600"
-                  required
-                  disabled={loading}
-                />
-              </div>
-            </motion.div>
+            <motion.form 
+              onSubmit={handleSubmit} 
+              className="space-y-5"
+              variants={containerVariants}
+            >
+              <motion.div variants={itemVariants}>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl opacity-0 group-focus-within:opacity-10 transition-opacity" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-400 transition-colors" size={20} />
+                  <motion.input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    whileFocus={{ scale: 1.01, borderColor: '#6366f1' }}
+                    className="w-full pl-12 pr-4 py-3.5 bg-gray-900/50 border border-gray-600 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:bg-gray-900/80 outline-none transition-all text-white placeholder:text-gray-500"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+              </motion.div>
 
-            <motion.div variants={itemVariants} className="space-y-1.5 md:space-y-2">
-              <div className="flex justify-between items-center ml-1">
-                <label className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Access_Key</label>
-                {isLogin && (
-                  <button 
+              <motion.div variants={itemVariants}>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-300">Password</label>
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     type="button" 
                     onClick={handleForgotPassword}
-                    className="text-[9px] md:text-[10px] font-black text-indigo-400 hover:text-white transition-colors uppercase tracking-widest"
+                    className="text-sm text-indigo-400 hover:text-indigo-300"
                   >
-                    Lost_Key?
-                  </button>
+                    Forgot password?
+                  </motion.button>
+                </div>
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl opacity-0 group-focus-within:opacity-10 transition-opacity" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-400 transition-colors" size={20} />
+                  <motion.input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    whileFocus={{ scale: 1.01, borderColor: '#6366f1' }}
+                    className="w-full pl-12 pr-14 py-3.5 bg-gray-900/50 border border-gray-600 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:bg-gray-900/80 outline-none transition-all text-white placeholder:text-gray-500"
+                    required
+                    disabled={loading}
+                  />
+                  <motion.button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </motion.button>
+                </div>
+              </motion.div>
+
+              <motion.button
+                variants={itemVariants}
+                whileHover={{ scale: 1.02, boxShadow: "0 10px 40px -10px rgba(99, 102, 241, 0.3)" }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={loading}
+                className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-500 hover:to-purple-500 transition-all shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 1 }}
+                  >
+                    <Loader2 size={22} />
+                  </motion.div>
+                ) : (
+                  'Sign In'
                 )}
-              </div>
-              <div className="relative group">
-                <Lock className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-500 transition-colors" size={16} md={18} />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl py-4 md:py-5 pl-12 md:pl-14 pr-12 md:pr-14 outline-none focus:border-indigo-500/50 focus:bg-white/[0.07] transition-all font-bold text-xs md:text-sm text-white placeholder:text-gray-600"
-                  required
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 md:right-5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors p-1"
-                >
-                  {showPassword ? <EyeOff size={16} md={18} /> : <Eye size={16} md={18} />}
-                </button>
-              </div>
+              </motion.button>
+            </motion.form>
+
+            {/* Divider */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="relative flex items-center my-8"
+            >
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent" />
+              <span className="px-4 text-sm text-gray-500 bg-gray-800">Or continue with</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent" />
             </motion.div>
 
-            <motion.button
-              variants={itemVariants}
-              whileHover={{ scale: 1.01, boxShadow: "0 20px 40px -10px rgba(79, 70, 229, 0.2)" }}
-              whileTap={{ scale: 0.99 }}
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 md:py-6 bg-white text-black rounded-xl md:rounded-[2rem] font-black text-xs md:text-sm uppercase tracking-[0.15em] md:tracking-[0.2em] hover:bg-indigo-600 hover:text-white transition-all duration-500 flex items-center justify-center space-x-3 md:space-x-4 shadow-2xl shadow-black/20 disabled:opacity-50 disabled:cursor-not-allowed mt-6 md:mt-8 relative overflow-hidden group"
+            {/* Social Buttons */}
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="grid grid-cols-2 gap-4"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative z-10 flex items-center gap-3 md:gap-4">
-                {loading ? (
-                  <Loader2 size={20} md={24} className="animate-spin" />
-                ) : (
-                  <>
-                    <span>{isLogin ? 'Initialize_Session' : 'Genesis_Protocol'}</span>
-                    <ArrowRight size={18} md={20} className="group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
-              </div>
-            </motion.button>
-          </motion.form>
-
-          <motion.div variants={itemVariants} className="mt-10 md:mt-12 relative z-10">
-            <div className="relative flex items-center justify-center mb-8 md:mb-10">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/5"></div>
-              </div>
-              <span className="relative bg-[#0b0b1a] px-4 md:px-6 text-[8px] md:text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] md:tracking-[0.4em]">Neural_Connect</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.03, backgroundColor: 'rgba(55, 65, 81, 0.8)' }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => handleSocialLogin('google')}
                 disabled={loading}
-                className="flex items-center justify-center space-x-3 md:space-x-4 py-4 md:py-5 bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl hover:bg-white/[0.08] hover:border-white/20 transition-all font-black text-[9px] md:text-[10px] uppercase tracking-widest disabled:opacity-50 group"
+                className="flex items-center justify-center gap-3 py-3.5 bg-gray-700/50 hover:bg-gray-700 border border-gray-600 rounded-xl transition-all text-gray-300 disabled:opacity-50"
               >
-                <FaGoogle size={16} md={18} className="group-hover:scale-110 transition-transform" />
-                <span>Google</span>
-              </button>
-              <button
+                <FaGoogle size={20} />
+                <span className="font-medium">Google</span>
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.03, backgroundColor: 'rgba(55, 65, 81, 0.8)' }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => handleSocialLogin('github')}
                 disabled={loading}
-                className="flex items-center justify-center space-x-3 md:space-x-4 py-4 md:py-5 bg-white/[0.03] border border-white/10 rounded-xl md:rounded-2xl hover:bg-white/[0.08] hover:border-white/20 transition-all font-black text-[9px] md:text-[10px] uppercase tracking-widest disabled:opacity-50 group"
+                className="flex items-center justify-center gap-3 py-3.5 bg-gray-700/50 hover:bg-gray-700 border border-gray-600 rounded-xl transition-all text-gray-300 disabled:opacity-50"
               >
-                <FaGithub size={16} md={18} className="group-hover:scale-110 transition-transform" />
-                <span>Github</span>
-              </button>
-            </div>
-          </motion.div>
+                <FaGithub size={20} />
+                <span className="font-medium">GitHub</span>
+              </motion.button>
+            </motion.div>
 
-          <motion.div variants={itemVariants} className="mt-12 md:mt-16 text-center relative z-10">
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              disabled={loading}
-              className="group text-[9px] md:text-[10px] font-black text-gray-500 hover:text-white transition-all tracking-[0.2em] md:tracking-[0.3em] uppercase"
+            {/* Sign Up Link */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="mt-8 text-center"
             >
-              {isLogin ? "New_Architect_ID?" : "Existing_Credential?"}
-              <span className="ml-2 md:ml-3 text-indigo-400 font-black group-hover:text-indigo-300 transition-colors border-b border-indigo-400/30 pb-1">
-                {isLogin ? 'Register_Now' : 'Sign_In_Now'}
-              </span>
-            </button>
+              <p className="text-gray-400">
+                Don't have an account?{' '}
+                <motion.span
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Link to="/register" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+                    Sign up
+                  </Link>
+                </motion.span>
+              </p>
+            </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
       </motion.div>
-
-      {/* Decorative footer tags */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-8 opacity-20 pointer-events-none">
-        <div className="flex items-center gap-2">
-          <Zap size={12} className="text-indigo-500" />
-          <span className="text-[8px] font-black uppercase tracking-[0.5em]">Neural_Link_Stable</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Sparkles size={12} className="text-purple-500" />
-          <span className="text-[8px] font-black uppercase tracking-[0.5em]">Encrypted_Stream_Active</span>
-        </div>
-      </div>
     </div>
   );
 };
