@@ -166,23 +166,23 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center p-4 md:p-8 relative">
       {/* Background Image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
         style={{ backgroundImage: 'url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5d2f751b-0791-4cb6-a646-8cfecd441a73/dftidq9-225b64ad-03c8-4565-861d-ae93119ca12c.png/v1/fill/w_1095,h_730,q_70,strp/anime_sano_city_backdrop_5_by_ashurashuraya_dftidq9-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9ODk2IiwicGF0aCI6Ii9mLzVkMmY3NTFiLTA3OTEtNGNiNi1hNjQ2LThjZmVjZDQ0MWE3My9kZnRpZHE5LTIyNWI2NGFkLTAzYzgtNDU2NS04NjFkLWFlOTMxMTljYTEyYy5wbmciLCJ3aWR0aCI6Ijw9MTM0NCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.sW2pYxronmPzGFkPgzIFpewyPkzvH34XHMrjtEMseZg)' }}
       />
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/70" />
+      <div className="absolute inset-0 bg-black/70 pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-lg"
+        className="w-full max-w-lg relative z-10"
       >
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-700/50 overflow-hidden"
+          className="bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-700/50 overflow-hidden relative z-20"
         >
           {/* Header Banner */}
           <motion.div variants={itemVariants} className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-center">

@@ -186,18 +186,18 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 md:p-8 relative">
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
         style={{ backgroundImage: 'url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/053bae63-7a8e-416f-b3e9-d65a7f485fce/dfkccom-cbeb9dbc-4771-44df-97f2-ca5d6835258f.png/v1/fill/w_1115,h_717,q_70,strp/sound_of_nature_by_ryky_dfkccom-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTIzNCIsInBhdGgiOiIvZi8wNTNiYWU2My03YThlLTQxNmYtYjNlOS1kNjVhN2Y0ODVmY2UvZGZrY2NvbS1jYmViOWRiYy00NzcxLTQ0ZGYtOTdmMi1jYTVkNjgzNTI1OGYucG5nIiwid2lkdGgiOiI8PTE5MjAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.4rkF4GHAMF1Ev7H6X2V5_nDI2u4rvms0nzAMmHwS6YY)' }}
       />
-      <div className="absolute inset-0 bg-black/70" />
+      <div className="absolute inset-0 bg-black/70 pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-lg"
+        className="w-full max-w-lg relative z-10"
       >
-        <div className="bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-700/50 overflow-hidden">
+        <div className="bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-700/50 overflow-hidden relative z-20">
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-center">
             <Link to="/" className="inline-flex items-center gap-3 justify-center">
               <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
