@@ -6,12 +6,11 @@ import MovieRow from '../components/MovieRow';
 import Scene from '../components/ThreeBackground';
 import { fetchTrendingMovies, fetchPopularMovies, fetchTopRatedMovies, fetchUpcomingMovies, fetchTrendingTV, fetchPopularTV } from '../api/tmdb';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Menu, X } from 'lucide-react';
+import { Loader2, Menu } from 'lucide-react';
 import heroBg from '../assets/BG1.gif';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-
-
+import { Box, Typography, IconButton } from '@mui/material';
 
 interface Movie {
   id: number;
@@ -42,7 +41,6 @@ const Home = () => {
     const checkAuth = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error || !session) {
-        await supabase.auth.signOut(); // Clear any stale local data
         navigate('/login');
       }
     };
@@ -57,7 +55,6 @@ const Home = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  // Animation Variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -103,7 +100,7 @@ const Home = () => {
             backdrop: `https://image.tmdb.org/t/p/original${m.backdrop_path}`,
             overview: m.overview,
             year: (m.release_date || m.first_air_date || '').split('-')[0],
-            genre: 'Action', // Simplified for now
+            genre: 'Action',
           }));
 
         const formattedTrending = formatMovies(trendingData).map(m => ({ ...m, mediaType: 'movie' as const }));
@@ -121,13 +118,11 @@ const Home = () => {
         setPopularTV(formattedPopularTV);
 
         if (formattedTrending.length > 0 || formattedTrendingTV.length > 0) {
-          // Mix trending movies and TV shows for hero section with higher randomness
           const allTrending = [
             ...formattedTrending.map(m => ({ ...m, type: 'movie' })),
             ...formattedTrendingTV.map(m => ({ ...m, type: 'tv' }))
           ];
           
-          // Shuffle and pick 5
           const shuffledHero = allTrending
             .sort(() => Math.random() - 0.5)
             .slice(0, 5);
@@ -150,9 +145,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen text-white overflow-x-hidden selection:bg-indigo-500/30">
-
-      {/* Background Image Layer */}
+    <Box sx={{ display: 'flex', minHeight: '100vh', color: 'white', overflowX: 'hidden', '&::selection': { bgcolor: 'rgba(99,102,241,0.3)' } }}>
       <motion.div 
         initial={{ scale: 1.2, opacity: 0 }}
         animate={{ scale: 1, opacity: 0.8 }}
@@ -174,12 +167,10 @@ const Home = () => {
             ease: "easeInOut" 
           }}
         />
-        {/* Subtle texture overlay for cinematic feel */}
         <div className="absolute inset-0 bg-[#050510]/40 backdrop-blur-[1px]" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#050510]/80 via-transparent to-[#050510]" />
       </motion.div>
       
-      {/* Sidebar Overlay for Mobile */}
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
@@ -192,33 +183,37 @@ const Home = () => {
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 h-24 px-6 flex items-center justify-between z-30 lg:hidden bg-gradient-to-b from-[#050510]/80 to-transparent pointer-events-none backdrop-blur-sm">
-        <button 
+      <div className="fixed top-0 left-0 right-0 h-24 z-30 lg:hidden px-3 flex items-center justify-between" style={{ background: 'linear-gradient(to bottom, rgba(5,5,16,0.8), transparent)', pointerEvents: 'none' }}>
+        <IconButton 
           onClick={() => setIsSidebarOpen(true)}
-          className="p-4 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl text-white pointer-events-auto active:scale-90 transition-all hover:bg-white/10 hover:border-white/20 shadow-xl"
+          sx={{ 
+            p: 2, 
+            bgcolor: 'rgba(255,255,255,0.05)', 
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 3,
+            color: 'white',
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.2)' }
+          }}
         >
-          <Menu size={24} />
-        </button>
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+          <Menu sx={{ fontSize: 24 }} />
+        </IconButton>
+        <div className="flex flex-row items-center gap-1.5">
+          <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
             <div className="w-5 h-5 bg-white rounded-sm rotate-45" />
           </div>
           <span className="text-xl font-black tracking-tighter text-white">NEXORA</span>
         </div>
-        <div className="w-12" /> {/* Spacer to balance the layout */}
+        <div className="w-12" />
       </div>
 
-      {/* Background */}
       <Scene />
 
-      {/* Main Content */}
-      <main className="flex-1 lg:pl-[280px] min-w-0 relative z-10 overflow-visible">
-        <div className="px-4 md:px-10 lg:px-16 py-10 lg:py-12">
-          <div className="max-w-[1600px] mx-auto space-y-12 md:space-y-24 overflow-visible">
+      <Box component="main" className="flex-1 lg:pl-[280px]" sx={{ minWidth: 0, position: 'relative', zIndex: 10, overflow: 'visible' }}>
+        <Box sx={{ px: { xs: 3, md: 6, lg: 8 }, py: { xs: 6, lg: 8 } }}>
+          <Box sx={{ maxWidth: 1600, mx: 'auto', display: 'flex', flexDirection: 'column', gap: { xs: 6, md: 12 }, overflow: 'visible' }}>
 
           <AnimatePresence mode="wait">
             {loading ? (
@@ -261,47 +256,44 @@ const Home = () => {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="space-y-16 md:space-y-32"
               >
                 {heroMovies.length > 0 && (
-                  <motion.div variants={itemVariants} className="pt-20 lg:pt-0">
+                  <motion.div variants={itemVariants}>
                     <HeroSection movies={heroMovies} />
                   </motion.div>
                 )}
 
-                <motion.div variants={itemVariants} className="space-y-16 md:space-y-32">
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 6, md: 12 } }}>
                   <MovieRow title="Trending_Now" movies={trending} />
                   <MovieRow title="Trending_Series" movies={trendingTV} mediaType="tv" />
                   <MovieRow title="Popular_Hits" movies={popular} />
                   <MovieRow title="Popular_Shows" movies={popularTV} mediaType="tv" />
                   <MovieRow title="Recommended_Nodes" movies={upcoming} />
                   <MovieRow title="Top_Rated_OS" movies={topRated} />
-                </motion.div>
+                </Box>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Footer */}
-          <footer className="border-t border-white/5 pt-16 pb-12 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
-            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse" />
+          <footer className="border-t border-white/5 pt-4 pb-3 flex flex-col md:flex-row justify-between items-center gap-3 text-center md:text-left">
+            <div className="flex flex-col md:flex-row items-center gap-3">
+              <div className="flex flex-row items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
                 <span className="text-[10px] tracking-[0.4em] text-gray-500 uppercase font-black">Core_System_Online</span>
               </div>
               <div className="h-1 w-1 rounded-full bg-white/10 hidden md:block" />
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] tracking-[0.4em] text-gray-600 uppercase font-black">Neural_Sync_v1.0.8</span>
-              </div>
+              <span className="text-[10px] tracking-[0.4em] text-gray-600 uppercase font-black">Neural_Sync_v1.0.8</span>
             </div>
-            <p className="text-[10px] tracking-[0.5em] text-gray-600 uppercase font-black">
+            <span className="text-[10px] tracking-[0.5em] text-gray-600 uppercase font-black">
               © 2026 NEXORA_OS
-            </p>
+            </span>
           </footer>
-        </div>
-      </div>
-    </main>
-  </div>
-);
+
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  );
 };
 
 export default Home;

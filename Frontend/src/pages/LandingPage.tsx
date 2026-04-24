@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Play, Zap, ArrowRight, PlayCircle, Sparkles, Monitor, Layers, Star, Menu, X } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { Container, Typography } from '@mui/material';
 import heroBg from '../assets/2.gif';
 import { fetchTrendingMovies, fetchTrendingTV } from '../api/tmdb';
 import { supabase } from '../lib/supabase';
@@ -390,26 +391,64 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-16 px-6 border-t border-white/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
-                <div className="w-4 h-4 bg-white rounded-sm rotate-45" />
+<footer className="py-20 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', bgcolor: 'rgba(0,0,0,0.3)' }}>
+        <Container maxWidth="lg">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="text-center md:text-left">
+              <div className="flex flex-col gap-2 items-center md:items-start">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-11 h-11 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <div className="w-4 h-4 bg-white rounded-sm rotate-45" />
+                  </div>
+                  <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, letterSpacing: '-0.02em' }}>NEXORA</Typography>
+                </div>
+                <Typography sx={{ color: 'grey.500', fontSize: '0.875rem', maxWidth: 280, textAlign: { xs: 'center', md: 'left' } }}>
+                  Experience next-generation streaming with AI-powered recommendations and 12K clarity on any device.
+                </Typography>
               </div>
-              <span className="text-xl font-black">NEXORA</span>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-8 text-sm text-gray-500">
-              <Link to="/Explore" className="hover:text-white transition">Explore</Link>
-              <Link to="/login" className="hover:text-white transition">Login</Link>
-              <Link to="/register" className="hover:text-white transition">Sign Up</Link>
+            <div>
+              <Typography sx={{ fontWeight: 700, mb: 2, fontSize: '0.875rem', letterSpacing: '0.05em' }}>BROWSE</Typography>
+              <div className="flex flex-col gap-1.5">
+                <Link to="/Explore" style={{ color: 'grey.500', textDecoration: 'none', fontSize: '0.875rem' }}>Movies</Link>
+                <Link to="/tv" style={{ color: 'grey.500', textDecoration: 'none', fontSize: '0.875rem' }}>TV Shows</Link>
+                <Link to="/reel" style={{ color: 'grey.500', textDecoration: 'none', fontSize: '0.875rem' }}>Reels</Link>
+                <Link to="/home" style={{ color: 'grey.500', textDecoration: 'none', fontSize: '0.875rem' }}>My List</Link>
+              </div>
             </div>
 
-            <p className="text-xs text-gray-600">© 2026 NEXORA</p>
+            <div>
+              <Typography sx={{ fontWeight: 700, mb: 2, fontSize: '0.875rem', letterSpacing: '0.05em' }}>ACCOUNT</Typography>
+              <div className="flex flex-col gap-1.5">
+                <Link to="/login" style={{ color: 'grey.500', textDecoration: 'none', fontSize: '0.875rem' }}>Sign In</Link>
+                <Link to="/register" style={{ color: 'grey.500', textDecoration: 'none', fontSize: '0.875rem' }}>Create Account</Link>
+                <Link to="/profile" style={{ color: 'grey.500', textDecoration: 'none', fontSize: '0.875rem' }}>Profile</Link>
+                <Link to="/settings" style={{ color: 'grey.500', textDecoration: 'none', fontSize: '0.875rem' }}>Settings</Link>
+              </div>
+            </div>
+
+            <div className="text-center md:text-left">
+              <Typography sx={{ fontWeight: 700, mb: 2, fontSize: '0.875rem', letterSpacing: '0.05em' }}>CONNECT</Typography>
+              <div className="flex flex-row gap-1.5 justify-center md:justify-start">
+                {['Twitter', 'Discord', 'Instagram', 'GitHub'].map((social) => (
+                  <div key={social} className="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center cursor-pointer hover:bg-white/10 hover:border-indigo-500 transition-all">
+                    <Typography sx={{ fontSize: '0.7rem', fontWeight: 600 }}>{social[0]}</Typography>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+
+          <div className="mt-8 pt-3 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-2">
+            <Typography sx={{ fontSize: '0.75rem', color: 'grey.600' }}>© 2026 NEXORA. All rights reserved.</Typography>
+            <div className="flex flex-row gap-3">
+              <Typography sx={{ fontSize: '0.75rem', color: 'grey.600', cursor: 'pointer', '&:hover': { color: 'grey.400' } }}>Privacy</Typography>
+              <Typography sx={{ fontSize: '0.75rem', color: 'grey.600', cursor: 'pointer', '&:hover': { color: 'grey.400' } }}>Terms</Typography>
+              <Typography sx={{ fontSize: '0.75rem', color: 'grey.600', cursor: 'pointer', '&:hover': { color: 'grey.400' } }}>Cookies</Typography>
+            </div>
+          </div>
+        </Container>
       </footer>
     </div>
   );

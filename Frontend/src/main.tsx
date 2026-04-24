@@ -1,13 +1,18 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { ThemeProvider, CssBaseline } from '@mui/material'
 import App from './App'
 import { SocialProvider } from './context/SocialContext';
+import theme from './theme'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <SocialProvider>
-      <App />
-    </SocialProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <SocialProvider>
+        <App />
+      </SocialProvider>
+    </ThemeProvider>
   </StrictMode>,
 )
