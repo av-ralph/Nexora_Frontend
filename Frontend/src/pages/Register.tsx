@@ -2,20 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
-import { 
-  Box, 
-  TextField, 
-  Button, 
-  Typography, 
-  Alert, 
-  InputAdornment, 
-  IconButton,
-  Paper,
-  Link as MuiLink,
-  CircularProgress
-} from '@mui/material';
-import { Email, Lock, Person, Visibility, VisibilityOff, CheckCircle, Cancel, AutoAwesome } from '@mui/icons-material';
 import { FaGithub, FaGoogle } from 'react-icons/fa';
+import { Email, Lock, Person, Visibility, VisibilityOff, CheckCircle, Cancel, AutoAwesome } from '@mui/icons-material';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -27,7 +15,6 @@ const Register = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
   
   const navigate = useNavigate();
 
@@ -147,34 +134,12 @@ const Register = () => {
   const strengthColors = ['#374151', '#ef4444', '#f59e0b', '#22c55e', '#10b981'];
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        p: 3,
-        position: 'relative',
-        overflow: 'hidden',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5d9e4751-11a9-4c69-a63a-95407c5bc596/dkwb84y-b78083ff-94f9-4c3e-8102-0c170bac079c.png/v1/fill/w_1920,h_1080,q_80,strp/new_forest_shrine_by_sophiesticatedarts_dkwb84y-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTA4MCIsInBhdGgiOiIvZi81ZDllNDc1MS0xMWE5LTRjNjktYTYzYS05NTQwN2M1YmM1OTYvZGt3Yjg0eS1iNzgwODNmZi05NGY5LTRjM2UtODEwMi0wYzE3MGJhYzA3OWMucG5nIiwid2lkdGgiOiI8PTE5MjAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.GGwA9bi4gnVKzvQwirh2_BEdReOIvF1F_JtvRxuhiLQ)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          zIndex: -2,
-        },
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          bgcolor: 'rgba(0, 0, 0, 0.7)',
-          zIndex: -1,
-        },
-      }}
-    >
-      {/* Animated glow effects */}
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-cover bg-center z-0" style={{ backgroundImage: 'url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/5d9e4751-11a9-4c69-a63a-95407c5bc596/dkwb84y-b78083ff-94f9-4c3e-8102-0c170bac079c.png/v1/fill/w_1920,h_1080,q_80,strp/new_forest_shrine_by_sophiesticatedarts_dkwb84y-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTA4MCIsInBhdGgiOiIvZi81ZDllNDc1MS0xMWE5LTRjNjktYTYzYS05NTQwN2M1YmM1OTYvZGt3Yjg0eS1iNzgwODNmZi05NGY5LTRjM2UtODEwMi0wYzE3MGJhYzA3OWMucG5nIiwid2lkdGgiOiI8PTE5MjAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.GGwA9bi4gnVKzvQwirh2_BEdReOIvF1F_JtvRxuhiLQ)' }} />
+      <div className="absolute inset-0 bg-black/70 z-0" />
+
+      {/* Glow effect */}
       <motion.div
         animate={{
           boxShadow: [
@@ -184,113 +149,36 @@ const Register = () => {
           ],
         }}
         transition={{ duration: 4, repeat: Infinity }}
-        style={{
-          position: 'absolute',
-          top: '10%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 600,
-          height: 600,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
+        className="absolute w-[600px] h-[600px] rounded-full pointer-events-none z-0"
+        style={{ top: '10%', left: '50%', transform: 'translateX(-50%)', background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%)' }}
       />
 
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        sx={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}
+        className="w-full max-w-sm relative z-10"
       >
-        <Paper
-          elevation={0}
-          sx={{
-            p: 5,
-            bgcolor: 'rgba(15, 23, 42, 0.85)',
-            borderRadius: 4,
-            border: '1px solid',
-            borderColor: 'rgba(16, 185, 129, 0.3)',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-          }}
-        >
-          {/* Logo Section */}
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <motion.div
-              whileHover={{ scale: 1.05, rotate: 5 }}
-              transition={{ type: 'spring', stiffness: 400 }}
-            >
-              <MuiLink 
-                component={Link} 
-                to="/" 
-                sx={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
-                  gap: 2, 
-                  textDecoration: 'none' 
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 56,
-                    height: 56,
-                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                    borderRadius: 3,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 10px 30px rgba(16, 185, 129, 0.4)',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 20,
-                      height: 20,
-                      bgcolor: 'white',
-                      borderRadius: 1,
-                      transform: 'rotate(45deg)',
-                    }}
-                  />
-                </Box>
-                <Typography 
-                  variant="h4" 
-                  component="span" 
-                  sx={{ 
-                    fontWeight: 800, 
-                    color: 'white',
-                    letterSpacing: '0.15em',
-                    textShadow: '0 0 30px rgba(16, 185, 129, 0.5)',
-                  }}
-                >
-                  NEXORA
-                </Typography>
-              </MuiLink>
-            </motion.div>
-          </Box>
+        {/* Card */}
+        <div className="bg-slate-900/85 p-8 rounded-2xl border border-emerald-500/30 backdrop-blur-xl shadow-2xl">
+          {/* Logo */}
+          <div className="text-center mb-6">
+            <Link to="/" className="inline-flex items-center gap-2 text-decoration-none">
+              <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/40">
+                <div className="w-5 h-5 bg-white rotate-45" />
+              </div>
+              <span className="text-2xl font-extrabold text-white tracking-widest">NEXORA</span>
+            </Link>
+          </div>
 
-          {/* Title Section */}
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Typography 
-              variant="h5" 
-              sx={{ 
-                fontWeight: 700, 
-                color: 'white', 
-                mb: 0.5,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 1,
-              }}
-            >
+          {/* Title */}
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-white flex items-center justify-center gap-2">
               Create Account
-              <AutoAwesome sx={{ fontSize: 18, color: 'secondary.main' }} />
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Join the future of entertainment
-            </Typography>
-          </Box>
+              <AutoAwesome className="text-emerald-400" style={{ fontSize: 18 }} />
+            </h1>
+            <p className="text-gray-400 text-sm mt-1">Join the future of entertainment</p>
+          </div>
 
           {/* Alerts */}
           <AnimatePresence>
@@ -299,446 +187,179 @@ const Register = () => {
                 initial={{ opacity: 0, height: 0, y: -10 }}
                 animate={{ opacity: 1, height: 'auto', y: 0 }}
                 exit={{ opacity: 0, height: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
+                className={`p-3 rounded-lg mb-4 border ${success ? 'bg-green-900/20 border-green-500/30 text-green-400' : 'bg-red-900/20 border-red-500/30 text-red-400'}`}
               >
-                <Alert 
-                  severity={success ? 'success' : 'error'}
-                  icon={success ? <CheckCircle /> : <Cancel />}
-                  sx={{ 
-                    mb: 3,
-                    bgcolor: success ? 'rgba(34, 197, 94, 0.08)' : 'rgba(239, 68, 68, 0.08)',
-                    border: '1px solid',
-                    borderColor: success ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)',
-                    borderRadius: 2,
-                    '& .MuiAlert-icon': {
-                      color: success ? 'success.main' : 'error.main',
-                    },
-                    '& .MuiAlert-message': {
-                      color: success ? 'success.main' : 'error.main',
-                      fontWeight: 500,
-                    },
-                  }}
-                >
-                  {success || error}
-                </Alert>
+                <div className="flex items-center gap-2">
+                  {success ? <CheckCircle style={{ fontSize: 18 }} /> : <Cancel style={{ fontSize: 18 }} />}
+                  <span className="text-sm font-medium">{success || error}</span>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* Form */}
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField
-              label="Full Name"
-              placeholder="John Doe"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              onFocus={() => setFocusedField('fullName')}
-              onBlur={() => setFocusedField(null)}
-              fullWidth
-              required
-              disabled={loading}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <motion.div
-                      animate={{ 
-                        color: focusedField === 'fullName' ? '#34d399' : '#6b7280',
-                        scale: focusedField === 'fullName' ? 1.1 : 1
-                      }}
-                    >
-                      <Person />
-                    </motion.div>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  bgcolor: 'rgba(30, 41, 59, 0.6)',
-                  borderRadius: 2,
-                  transition: 'all 0.3s ease',
-                  '& fieldset': { 
-                    borderColor: focusedField === 'fullName' ? 'rgba(52, 211, 153, 0.5)' : 'rgba(71, 85, 105, 0.4)',
-                    transition: 'all 0.3s ease',
-                  },
-                  '&:hover fieldset': { borderColor: 'rgba(52, 211, 153, 0.5)' },
-                  '&.Mui-focused fieldset': { 
-                    borderColor: 'secondary.main',
-                    boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.15)',
-                  },
-                },
-                '& .MuiInputLabel-root': { 
-                  color: focusedField === 'fullName' ? 'secondary.main' : 'text.secondary',
-                },
-                '& .MuiInputBase-input': { 
-                  color: 'white',
-                  fontWeight: 500,
-                },
-              }}
-            />
-
-            <TextField
-              label="Email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onFocus={() => setFocusedField('email')}
-              onBlur={() => setFocusedField(null)}
-              fullWidth
-              required
-              disabled={loading}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <motion.div
-                      animate={{ 
-                        color: focusedField === 'email' ? '#34d399' : '#6b7280',
-                        scale: focusedField === 'email' ? 1.1 : 1
-                      }}
-                    >
-                      <Email />
-                    </motion.div>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  bgcolor: 'rgba(30, 41, 59, 0.6)',
-                  borderRadius: 2,
-                  transition: 'all 0.3s ease',
-                  '& fieldset': { 
-                    borderColor: focusedField === 'email' ? 'rgba(52, 211, 153, 0.5)' : 'rgba(71, 85, 105, 0.4)',
-                    transition: 'all 0.3s ease',
-                  },
-                  '&:hover fieldset': { borderColor: 'rgba(52, 211, 153, 0.5)' },
-                  '&.Mui-focused fieldset': { 
-                    borderColor: 'secondary.main',
-                    boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.15)',
-                  },
-                },
-                '& .MuiInputLabel-root': { 
-                  color: focusedField === 'email' ? 'secondary.main' : 'text.secondary',
-                },
-                '& .MuiInputBase-input': { 
-                  color: 'white',
-                  fontWeight: 500,
-                },
-              }}
-            />
-
-            <Box>
-              <TextField
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Create a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onFocus={() => setFocusedField('password')}
-                onBlur={() => setFocusedField(null)}
-                fullWidth
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="relative">
+              <Person className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" style={{ fontSize: 20 }} />
+              <input
+                type="text"
+                placeholder="John Doe"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 required
                 disabled={loading}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <motion.div
-                        animate={{ 
-                          color: focusedField === 'password' ? '#34d399' : '#6b7280',
-                          scale: focusedField === 'password' ? 1.1 : 1
-                        }}
-                      >
-                        <Lock />
-                      </motion.div>
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                        sx={{ 
-                          color: 'text.secondary',
-                          transition: 'all 0.3s ease',
-                          '&:hover': { color: 'secondary.main' },
-                        }}
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: 'rgba(30, 41, 59, 0.6)',
-                    borderRadius: 2,
-                    transition: 'all 0.3s ease',
-                    '& fieldset': { 
-                      borderColor: focusedField === 'password' ? 'rgba(52, 211, 153, 0.5)' : 'rgba(71, 85, 105, 0.4)',
-                      transition: 'all 0.3s ease',
-                    },
-                    '&:hover fieldset': { borderColor: 'rgba(52, 211, 153, 0.5)' },
-                    '&.Mui-focused fieldset': { 
-                      borderColor: 'secondary.main',
-                      boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.15)',
-                    },
-                  },
-                  '& .MuiInputLabel-root': { 
-                    color: focusedField === 'password' ? 'secondary.main' : 'text.secondary',
-                  },
-                  '& .MuiInputBase-input': { 
-                    color: 'white',
-                    fontWeight: 500,
-                  },
-                }}
+                className="w-full bg-slate-800/60 pl-10 pr-4 py-3 rounded-lg border border-slate-600/40 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
               />
+            </div>
+
+            <div className="relative">
+              <Email className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" style={{ fontSize: 20 }} />
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+                className="w-full bg-slate-800/60 pl-10 pr-4 py-3 rounded-lg border border-slate-600/40 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+              />
+            </div>
+
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" style={{ fontSize: 20 }} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Create a password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="w-full bg-slate-800/60 pl-10 pr-12 py-3 rounded-lg border border-slate-600/40 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-400 transition-all"
+                >
+                  {showPassword ? <Visibility style={{ fontSize: 20 }} /> : <VisibilityOff style={{ fontSize: 20 }} />}
+                </button>
+              </div>
               {password && (
-                <Box sx={{ mt: 1.5 }}>
-                  <Box sx={{ display: 'flex', gap: 0.5, mb: 1 }}>
+                <div className="mt-2">
+                  <div className="flex gap-1 mb-1">
                     {passwordRequirements.map((req, index) => (
-                      <Box
+                      <div
                         key={index}
-                        sx={{
-                          flex: 1,
-                          height: 3,
-                          borderRadius: 1,
-                          bgcolor: req.test ? strengthColors[getPasswordStrength()] : 'rgba(55, 65, 81, 0.8)',
-                          transition: 'background-color 0.3s ease',
-                        }}
+                        className="flex-1 h-[3px] rounded-sm transition-all"
+                        style={{ backgroundColor: req.test ? strengthColors[getPasswordStrength()] : 'rgba(55, 65, 81, 0.8)' }}
                       />
                     ))}
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  </div>
+                  <div className="flex justify-between">
                     {passwordRequirements.map((req, index) => (
-                      <Typography 
+                      <span 
                         key={index}
-                        variant="caption"
-                        sx={{ 
-                          color: req.test ? 'secondary.main' : 'text.secondary',
-                          fontSize: '0.65rem',
-                          fontWeight: req.test ? 600 : 400,
-                          transition: 'all 0.2s ease',
-                        }}
+                        className="text-[10px] font-medium transition-all"
+                        style={{ color: req.test ? '#34d399' : '#6b7280' }}
                       >
                         {req.label}
-                      </Typography>
+                      </span>
                     ))}
-                  </Box>
-                </Box>
+                  </div>
+                </div>
               )}
-            </Box>
+            </div>
 
-            <Box>
-              <TextField
-                label="Confirm Password"
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                onFocus={() => setFocusedField('confirmPassword')}
-                onBlur={() => setFocusedField(null)}
-                fullWidth
-                required
-                disabled={loading}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <motion.div
-                        animate={{ 
-                          color: focusedField === 'confirmPassword' ? '#34d399' : '#6b7280',
-                          scale: focusedField === 'confirmPassword' ? 1.1 : 1
-                        }}
-                      >
-                        <Lock />
-                      </motion.div>
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        edge="end"
-                        sx={{ 
-                          color: 'text.secondary',
-                          transition: 'all 0.3s ease',
-                          '&:hover': { color: 'secondary.main' },
-                        }}
-                      >
-                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: 'rgba(30, 41, 59, 0.6)',
-                    borderRadius: 2,
-                    transition: 'all 0.3s ease',
-                    '& fieldset': { 
-                      borderColor: focusedField === 'confirmPassword' ? 'rgba(52, 211, 153, 0.5)' : 'rgba(71, 85, 105, 0.4)',
-                      transition: 'all 0.3s ease',
-                    },
-                    '&:hover fieldset': { borderColor: 'rgba(52, 211, 153, 0.5)' },
-                    '&.Mui-focused fieldset': { 
-                      borderColor: 'secondary.main',
-                      boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.15)',
-                    },
-                  },
-                  '& .MuiInputLabel-root': { 
-                    color: focusedField === 'confirmPassword' ? 'secondary.main' : 'text.secondary',
-                  },
-                  '& .MuiInputBase-input': { 
-                    color: 'white',
-                    fontWeight: 500,
-                  },
-                }}
-              />
-              {confirmPassword && (
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    color: password === confirmPassword ? 'secondary.main' : 'error.main',
-                    mt: 0.5,
-                    display: 'block',
-                    fontWeight: 500,
-                  }}
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" style={{ fontSize: 20 }} />
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  className="w-full bg-slate-800/60 pl-10 pr-12 py-3 rounded-lg border border-slate-600/40 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-400 transition-all"
                 >
+                  {showConfirmPassword ? <Visibility style={{ fontSize: 20 }} /> : <VisibilityOff style={{ fontSize: 20 }} />}
+                </button>
+              </div>
+              {confirmPassword && (
+                <p className={`text-xs font-medium mt-1 ${password === confirmPassword ? 'text-emerald-400' : 'text-red-400'}`}>
                   {password === confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
-                </Typography>
+                </p>
               )}
-            </Box>
+            </div>
 
-            <motion.div
+            <motion.button
               whileHover={{ scale: loading ? 1 : 1.01 }}
               whileTap={{ scale: loading ? 1 : 0.99 }}
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-emerald-600 rounded-lg font-semibold text-white shadow-lg shadow-emerald-600/30 hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-600/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={loading}
-                fullWidth
-                sx={{
-                  py: 1.8,
-                  bgcolor: 'secondary.main',
-                  borderRadius: 2,
-                  fontSize: '1rem',
-                  fontWeight: 600,
-                  letterSpacing: '0.02em',
-                  boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)',
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    bgcolor: 'secondary.dark',
-                    boxShadow: '0 6px 25px rgba(16, 185, 129, 0.5)',
-                  },
-                  '&:disabled': { 
-                    bgcolor: 'rgba(16, 185, 129, 0.5)',
-                    boxShadow: 'none',
-                  },
-                }}
-              >
-                {loading ? (
-                  <CircularProgress size={24} sx={{ color: 'white' }} />
-                ) : 'Create Account'}
-              </Button>
-            </motion.div>
-          </Box>
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                </div>
+              ) : 'Create Account'}
+            </motion.button>
+          </form>
 
           {/* Divider */}
-          <Box sx={{ mt: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, my: 3 }}>
-              <Box sx={{ flex: 1, height: 1, bgcolor: 'rgba(255, 255, 255, 0.08)' }} />
-              <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.1em' }}>
-                OR CONTINUE WITH
-              </Typography>
-              <Box sx={{ flex: 1, height: 1, bgcolor: 'rgba(255, 255, 255, 0.08)' }} />
-            </Box>
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <div className="flex items-center gap-3 my-4">
+              <div className="flex-1 h-px bg-white/10" />
+              <span className="text-xs text-gray-500 font-semibold tracking-wider">OR CONTINUE WITH</span>
+              <div className="flex-1 h-px bg-white/10" />
+            </div>
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <motion.div
+            <div className="flex gap-3">
+              <motion.button
                 whileHover={{ scale: loading ? 1 : 1.02 }}
                 whileTap={{ scale: loading ? 1 : 0.98 }}
-                style={{ flex: 1 }}
+                onClick={() => handleSocialLogin('google')}
+                disabled={loading}
+                className="flex-1 py-3 bg-slate-800/60 border border-slate-600/40 rounded-lg text-gray-400 font-medium hover:bg-slate-700/60 hover:border-white/20 transition-all flex items-center justify-center gap-2"
               >
-                <Button
-                  onClick={() => handleSocialLogin('google')}
-                  disabled={loading}
-                  fullWidth
-                  startIcon={<FaGoogle style={{ fontSize: 20 }} />}
-                  sx={{
-                    py: 1.5,
-                    bgcolor: 'rgba(30, 41, 59, 0.6)',
-                    border: '1px solid',
-                    borderColor: 'rgba(71, 85, 105, 0.4)',
-                    borderRadius: 2,
-                    color: 'text.secondary',
-                    fontWeight: 500,
-                    transition: 'all 0.3s ease',
-                    '&:hover': { 
-                      bgcolor: 'rgba(71, 85, 105, 0.3)', 
-                      borderColor: 'rgba(255, 255, 255, 0.15)',
-                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
-                    },
-                  }}
-                >
-                  Google
-                </Button>
-              </motion.div>
-              <motion.div
+                <FaGoogle style={{ fontSize: 20 }} />
+                Google
+              </motion.button>
+              <motion.button
                 whileHover={{ scale: loading ? 1 : 1.02 }}
                 whileTap={{ scale: loading ? 1 : 0.98 }}
-                style={{ flex: 1 }}
+                onClick={() => handleSocialLogin('github')}
+                disabled={loading}
+                className="flex-1 py-3 bg-slate-800/60 border border-slate-600/40 rounded-lg text-gray-400 font-medium hover:bg-slate-700/60 hover:border-white/20 transition-all flex items-center justify-center gap-2"
               >
-                <Button
-                  onClick={() => handleSocialLogin('github')}
-                  disabled={loading}
-                  fullWidth
-                  startIcon={<FaGithub style={{ fontSize: 20 }} />}
-                  sx={{
-                    py: 1.5,
-                    bgcolor: 'rgba(30, 41, 59, 0.6)',
-                    border: '1px solid',
-                    borderColor: 'rgba(71, 85, 105, 0.4)',
-                    borderRadius: 2,
-                    color: 'text.secondary',
-                    fontWeight: 500,
-                    transition: 'all 0.3s ease',
-                    '&:hover': { 
-                      bgcolor: 'rgba(71, 85, 105, 0.3)', 
-                      borderColor: 'rgba(255, 255, 255, 0.15)',
-                      boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
-                    },
-                  }}
-                >
-                  GitHub
-                </Button>
-              </motion.div>
-            </Box>
-          </Box>
+                <FaGithub style={{ fontSize: 20 }} />
+                GitHub
+              </motion.button>
+            </div>
+          </div>
 
           {/* Footer */}
-          <Box sx={{ mt: 3, textAlign: 'center', pt: 2, borderTop: '1px solid', borderColor: 'rgba(255, 255, 255, 0.06)' }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+          <div className="mt-4 pt-4 border-t border-white/10 text-center">
+            <p className="text-gray-400 text-sm">
               Already have an account?{' '}
-              <MuiLink 
-                component={Link} 
-                to="/login" 
-                sx={{ 
-                  color: 'secondary.light',
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  '&:hover': { 
-                    color: 'white',
-                    textShadow: '0 0 10px rgba(52, 211, 248, 0.5)',
-                  },
-                }}
-              >
+              <Link to="/login" className="text-emerald-400 font-semibold hover:text-emerald-300 transition-all">
                 Sign in
-              </MuiLink>
-            </Typography>
-          </Box>
-        </Paper>
+              </Link>
+            </p>
+          </div>
+        </div>
       </motion.div>
-    </Box>
+    </div>
   );
 };
 
